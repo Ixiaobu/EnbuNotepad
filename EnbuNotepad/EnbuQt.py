@@ -3,7 +3,7 @@ from PyQt5.QtCore import pyqtSignal, Qt, QCoreApplication
 from PyQt5.QtGui import QFont, QIcon
 from PyQt5.QtWidgets import QPushButton, QLabel, QHBoxLayout, QComboBox, QToolTip, QWidget, QVBoxLayout, QScrollArea, \
     QLineEdit, QMenu, QAction
-
+import re
 import SQLopt
 from AlertWindow import AlertWindow
 from DisPlayClassInfo import DisPlayClassInfo
@@ -677,6 +677,21 @@ class AddClassButton(QPushButton):
         self.UIcss()
         self.UIfun()
 
+# 可以打开网页
+class CustomLabel(QLabel):
+    def __init__(self, text, dad):
+        super(CustomLabel, self).__init__(text, dad)
+
+        self.setOpenExternalLinks(True)
+        self.setTextInteractionFlags(Qt.TextBrowserInteraction)
+        self.setWordWrap(True)
+        self.setTextFormat(Qt.RichText)
+
+    def setText(self, text):
+        # Find URLs in the text and convert them to clickable links
+        text_with_links = re.sub(r'(https?://\S+)', r'<a href="\1">\1</a>', text)
+        super().setText(text_with_links)
+
 # 横向展示的框框详细
 class ShowLine(QLabel):
     def __init__(self, name, dad, data):
@@ -693,7 +708,7 @@ class ShowLine(QLabel):
     def UIinit(self):
         self.ImgShow   = SquareLabel('', self)  # 显示图片
         self.NameLable = QLabel('', self)  # 显示名字
-        self.TextShow1 = QLabel('', self)  # 第一个信息
+        self.TextShow1 = CustomLabel('', self)  # 第一个信息
         self.TextBox   = QLabel('', self)  # 一个容器
         self.Textlayout= QVBoxLayout()     # 创建一个垂直布局
         self.layout    = QHBoxLayout()  # 创建一个横向布局
