@@ -373,27 +373,35 @@ class AutoResizeTextEdit(QTextEdit):
               }
               """ % (temp_qss.stroke_color1, temp_qss.theme_color))
         self.setVerticalScrollBar(self.mybar)  # 把滚动条附上去
+        self.textChanged.connect(self.myresize)
 
+    def myresize(self):
+        if self.ResizeIng:
+            return
+        self.ResizeIng = True
+        try:
+            vertical_scrollbar = self.verticalScrollBar()
+            temp_count = 100
+            while not vertical_scrollbar.isVisible() and self.height() > 50 and temp_count:
+                self.setMinimumHeight(self.height() - 1)
+                self.dad.setMinimumHeight(self.dad.height() - 1)
+                QCoreApplication.processEvents()  # 强制处理事件队列，立即更新界面
+                temp_count -= 1
 
-        def resize():
-            if self.ResizeIng:
-                return
-            self.ResizeIng = True
-            try:
-                vertical_scrollbar = self.verticalScrollBar()
-                while not vertical_scrollbar.isVisible() and self.height() > 50:
-                    self.setMinimumHeight(self.height() - 1)
-                    self.dad.setMinimumHeight(self.dad.height() - 1)
-                    QCoreApplication.processEvents()  # 强制处理事件队列，立即更新界面
+            temp_count = 100
+            while vertical_scrollbar.isVisible() and temp_count:
+                self.setMinimumHeight(self.height() + 1)
+                self.dad.setMinimumHeight(self.dad.height() + 1)
+                QCoreApplication.processEvents()  # 强制处理事件队列，立即更新界面
+                temp_count -= 1
 
-                while vertical_scrollbar.isVisible():
-                    self.setMinimumHeight(self.height() + 1)
-                    self.dad.setMinimumHeight(self.dad.height() + 1)
-                    QCoreApplication.processEvents()  # 强制处理事件队列，立即更新界面
-            except:
-                pass
-            self.ResizeIng = False
-        self.textChanged.connect(resize)
+        except:
+            pass
+        self.ResizeIng = False
+
+    def showEvent(self, a0):
+        super(AutoResizeTextEdit, self).showEvent(a0)
+        self.myresize()
 
 # 图片拖入显示
 class ImgInputAndShow(QLabel):
@@ -821,7 +829,8 @@ class DisplayInfoWindowSamllImg(EnbuBasicWindow):
         self.dad = dad
         self.data = data
         self.ChildWindow = None  # 子窗口打开情况
-        self.resize(450, 500)  # 尺寸
+        self.opened = False
+        self.resize(450, 700)  # 尺寸
 
     def UIinit(self):
         self.Theme = self.dad.Theme
@@ -846,7 +855,8 @@ class DisplayInfoWindowSamllImg(EnbuBasicWindow):
         self.BackGround.setStyleSheet('''background-color: %s ;
                                         border: 1px solid %s;
                                         border-radius: 7px''' % (temp_qss.fill_color2, temp_qss.stroke_color1))
-        self.BackGround.setGraphicsEffect(self.Get_Shaow())
+        if not self.opened:
+            self.BackGround.setGraphicsEffect(self.Get_Shaow())
 
         # 最小化按钮
         self.MiniButton.setFont(QtGui.QFont("arial", AllQss.font_size + 20))
@@ -896,6 +906,8 @@ class DisplayInfoWindowSamllImg(EnbuBasicWindow):
 
         # 放图片，名字
         self.ImgAndNameInputQt.SetData(self.data[0], self.data[1])
+
+        self.opened = True
 
     def UIsite(self):
         # 背景
@@ -1136,6 +1148,7 @@ class DisplayInfoWindowBigImg(EnbuBasicWindow):
         self.dad = dad
         self.data = data
         self.ChildWindow = None  # 子窗口打开情况
+        self.opened = False
         self.resize(450, 500)  # 尺寸
 
     def UIinit(self):
@@ -1161,7 +1174,8 @@ class DisplayInfoWindowBigImg(EnbuBasicWindow):
         self.BackGround.setStyleSheet('''background-color: %s ;
                                         border: 1px solid %s;
                                         border-radius: 7px''' % (temp_qss.fill_color2, temp_qss.stroke_color1))
-        self.BackGround.setGraphicsEffect(self.Get_Shaow())
+        if not self.opened:
+            self.BackGround.setGraphicsEffect(self.Get_Shaow())
 
         # 最小化按钮
         self.MiniButton.setFont(QtGui.QFont("arial", AllQss.font_size + 20))
@@ -1208,6 +1222,8 @@ class DisplayInfoWindowBigImg(EnbuBasicWindow):
             QPushButton:hover{background:%s;border-radius: 30px;border: 5px solid %s;color: %s;font-weight: bold;}''' %
             (temp_qss.theme_color, "#ffffff", temp_qss.theme_color, "#ffffff", "#ffffff"))
         self.FinishButton.setGraphicsEffect(self.Get_Shaow())
+
+        self.opened = True
 
     def UIsite(self):
         # 背景

@@ -24,7 +24,7 @@ pip install Pillow
 pip install chardet
 '''
 # pyinstaller -F -w -i G:\Management\data\ico\Logo3.ico main.py
-
+# g:\EnbuNotepad\EnbuNotepad\venv\scripts\python.exe"  "G:\EnbuNotepad\EnbuNotepad\venv\Scripts\pyinstaller.exe" -F -w -i G:\EnbuNotepad\EnbuNotepad\data\ico\Logo3.ico main.py
 
 # 主窗口类
 class MainWindow(EnbuBasicWindow):

@@ -681,7 +681,7 @@ class AddClassButton(QPushButton):
 class CustomLabel(QLabel):
     def __init__(self, text, dad):
         super(CustomLabel, self).__init__(text, dad)
-
+        self.dad = dad
         self.setOpenExternalLinks(True)
         self.setTextInteractionFlags(Qt.TextBrowserInteraction)
         self.setWordWrap(True)
@@ -691,6 +691,12 @@ class CustomLabel(QLabel):
         # Find URLs in the text and convert them to clickable links
         text_with_links = re.sub(r'(https?://\S+)', r'<a href="\1">\1</a>', text)
         super().setText(text_with_links)
+
+    def mousePressEvent(self, event):
+        pattern = "^<a href="
+        if not re.match(pattern, self.text()):
+            self.dad.mousePressEvent(event)
+
 
 # 横向展示的框框详细
 class ShowLine(QLabel):
